@@ -5,20 +5,14 @@ classdef FxLMSSystem < matlab.System
     %   in1: x  (riferimento, scalare, sample-by-sample)
     %   in2: e  (errore microfonico, scalare)
     % Uscite:
-    %   y   (anti-rumore, scalare)
+    %   y     (anti-rumore, scalare)
     %   e_out (errore registrato per logging, scalare)
-    %
-    % Parametri esposti come mask:
-    %   Lw           Lunghezza tap del filtro di controllo W(z)
-    %   SecondaryPath Vettore s_est della stima del Secondary Path
-    %   StepSize     mu del NLMS
-    %   Epsilon      regolarizzazione per stabilita numerica
 
     properties (Nontunable)
-        Lw (1,1) double {mustBePositive, mustBeInteger} = 512
-        SecondaryPath double = zeros(256,1)
-        StepSize (1,1) double {mustBePositive} = 5e-3
-        Epsilon (1,1) double {mustBePositive} = 1e-2
+        Lw = 512
+        SecondaryPath = zeros(256,1)
+        StepSize = 5e-3
+        Epsilon = 1e-2
     end
 
     properties (Access = private)

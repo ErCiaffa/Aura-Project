@@ -4,50 +4,51 @@ classdef FDTD3DSystem < matlab.System
     % Risolve l'equazione delle onde scalare in pressione:
     %   p[n+1] = 2 p[n] - p[n-1] + (c*dt/dx)^2 * Laplaciano(p[n])
     %
-    % Le sorgenti acustiche sono iniettate come termine soft (additivo)
-    % alle celle delle rispettive posizioni:
-    %   - Sorgente primaria (rumore esterno)
-    %   - Emettitore ANC (anti-rumore)
+    % Sorgenti acustiche iniettate come termine soft (additivo) alle celle
+    % delle rispettive posizioni: sorgente primaria + emettitore ANC.
     %
     % Stabilita di Courant 3D:  c * dt / dx <= 1/sqrt(3)
     % Default: dx = 0.2 m, fs_field = 4000 Hz -> Courant ~= 0.43 (stabile).
     %
-    % Bordi: assorbenti di primo ordine (Mur) per simulare stanza aperta,
-    % oppure riflettenti rigidi se 'BoundaryType' = 'Rigid'.
+    % Bordi: assorbenti di primo ordine (Mur) oppure riflettenti rigidi.
     %
     % Porte:
     %   in1: x_src  (campione sorgente primaria)
     %   in2: y_anc  (campione emettitore ANC)
     % Uscite:
-    %   P  : tensore di pressione [Nx x Ny x Nz]
-    %   p_err : pressione campionata alla posizione del mic di errore (scalare)
+    %   P     : tensore di pressione [Nx x Ny x Nz]
+    %   p_err : pressione campionata alla posizione del mic di errore
 
     properties (Nontunable)
-        RoomSize (1,3) double = [6 6 3]
-        Dx (1,1) double {mustBePositive} = 0.2
-        FieldSampleRate (1,1) double {mustBePositive} = 4000
-        SoundSpeed (1,1) double {mustBePositive} = 343
+        RoomSize = [6 6 3]
+        Dx = 0.2
+        FieldSampleRate = 4000
+        SoundSpeed = 343
 
-        SourcePos (1,3) double = [1.0 3.0 1.5]
-        AncPos    (1,3) double = [4.0 3.0 1.5]
-        ErrorMicPos (1,3) double = [5.0 3.0 1.5]
+        SourcePos   = [1.0 3.0 1.5]
+        AncPos      = [4.0 3.0 1.5]
+        ErrorMicPos = [5.0 3.0 1.5]
 
-        BoundaryType (1,:) char {mustBeMember(BoundaryType, {'Mur','Rigid'})} = 'Mur'
-        SourceGain (1,1) double = 1.0
-        AncGain    (1,1) double = 1.0
+        BoundaryType = 'Mur'
+        SourceGain = 1.0
+        AncGain    = 1.0
+    end
+
+    properties (Hidden, Constant)
+        BoundaryTypeSet = matlab.system.StringSet({'Mur','Rigid'})
     end
 
     properties (Access = private)
         Nx
         Ny
         Nz
-        CourantSq          % (c*dt/dx)^2
-        MurCoeff           % (c*dt - dx)/(c*dt + dx)
-        Pcur               % p[n]
-        Pprev              % p[n-1]
-        SrcIdx (1,3) double
-        AncIdx (1,3) double
-        ErrIdx (1,3) double
+        CourantSq
+        MurCoeff
+        Pcur
+        Pprev
+        SrcIdx
+        AncIdx
+        ErrIdx
     end
 
     methods (Access = protected)
@@ -152,7 +153,6 @@ classdef FDTD3DSystem < matlab.System
 
     methods (Access = private)
         function idx = posToIdx(obj, pos)
-            % Converte coordinate in metri in indici di griglia (1-based, clampato).
             i = round(pos(1) / obj.Dx) + 1;
             j = round(pos(2) / obj.Dx) + 1;
             k = round(pos(3) / obj.Dx) + 1;

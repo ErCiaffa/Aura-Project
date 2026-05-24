@@ -9,9 +9,9 @@ classdef AdaptiveLMSSystem < matlab.System
     %   e (errore = d - y)
 
     properties (Nontunable)
-        FilterLength (1,1) double {mustBePositive, mustBeInteger} = 512
-        StepSize (1,1) double {mustBePositive} = 5e-3
-        UseNLMS (1,1) logical = true
+        FilterLength = 512
+        StepSize = 5e-3
+        UseNLMS = true
     end
 
     properties (Access = private)
@@ -20,7 +20,7 @@ classdef AdaptiveLMSSystem < matlab.System
 
     methods (Access = protected)
         function setupImpl(obj)
-            obj.Filter = AdaptiveLMSFilter(obj.FilterLength, obj.StepSize, obj.UseNLMS);
+            obj.Filter = AdaptiveLMSFilter(obj.FilterLength, obj.StepSize, logical(obj.UseNLMS));
         end
 
         function [y, e] = stepImpl(obj, x_in, d_in)

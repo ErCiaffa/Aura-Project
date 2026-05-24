@@ -3,10 +3,8 @@ classdef SourceGeneratorSystem < matlab.System
     %
     % Genera l'intero buffer di durata 'Duration' una sola volta in setup
     % (via AdvancedSoundGenerator) e lo riproduce campione per campione.
-    % Questo evita la generazione costosa dei kernel a runtime e garantisce
-    % una sample-rate stabile.
     %
-    % Sorgenti supportate:
+    % Sorgenti supportate (selezionabili da dropdown nella mask Simulink):
     %   'Jackhammer'  - AdvancedSoundGenerator.Jackhammer
     %   'ClubNoise'   - AdvancedSoundGenerator.ClubNoise
     %   'PinkNoise'   - AdvancedSoundGenerator.PinkNoise
@@ -14,11 +12,14 @@ classdef SourceGeneratorSystem < matlab.System
     % In loop continuo: quando il buffer si esaurisce ricomincia da 0.
 
     properties (Nontunable)
-        SourceType (1,:) char {mustBeMember(SourceType, ...
-            {'Jackhammer','ClubNoise','PinkNoise'})} = 'PinkNoise'
-        SampleRate (1,1) double {mustBePositive} = 48000
-        Duration (1,1) double {mustBePositive} = 10
-        Amplitude (1,1) double = 1.0
+        SourceType = 'PinkNoise'
+        SampleRate = 48000
+        Duration = 10
+        Amplitude = 1.0
+    end
+
+    properties (Hidden, Constant)
+        SourceTypeSet = matlab.system.StringSet({'Jackhammer','ClubNoise','PinkNoise'})
     end
 
     properties (Access = private)

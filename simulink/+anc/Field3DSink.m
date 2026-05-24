@@ -2,34 +2,25 @@ classdef Field3DSink < matlab.System
     % Field3DSink  Visualizer realtime di una slice del campo di pressione 3D.
     %
     % Riceve il tensore P [Nx x Ny x Nz] dal solver FDTD3DSystem e renderizza
-    % una slice del piano selezionato come imagesc (1 ordine di grandezza
-    % piu veloce di slice 3D).
-    %
-    % Sovrappone marker per:
-    %   - sorgente primaria (cerchio)
-    %   - emettitore ANC   (quadrato)
-    %   - mic di errore    (croce)
+    % una slice del piano selezionato come imagesc.
     %
     % SlicePlane: 'XY' (z fisso), 'XZ' (y fisso), 'YZ' (x fisso)
-    % SliceIndex: indice della slice (1-based)
-    %
-    % Refresh: aggiorna ogni N step (RefreshDecim) per non saturare il
-    % rendering. Con sample rate 4 kHz e RefreshDecim=20 -> 200 fps target.
-    %
-    % Opzione RecordField: se true accumula il campo su disco in
-    % 'field_recording.mat' alla fine della simulazione (truncato a
-    % MaxRecordSteps step per evitare esaurimento RAM).
+    % Refresh: aggiorna ogni RefreshDecim step.
 
     properties (Nontunable)
-        SlicePlane (1,:) char {mustBeMember(SlicePlane, {'XY','XZ','YZ'})} = 'XY'
-        SliceIndex (1,1) double {mustBePositive, mustBeInteger} = 8
-        RefreshDecim (1,1) double {mustBePositive, mustBeInteger} = 20
-        ColorLimit (1,1) double {mustBePositive} = 0.05
-        RoomSize (1,3) double = [6 6 3]
-        Dx (1,1) double {mustBePositive} = 0.2
-        SourcePos (1,3) double = [1.0 3.0 1.5]
-        AncPos    (1,3) double = [4.0 3.0 1.5]
-        ErrorMicPos (1,3) double = [5.0 3.0 1.5]
+        SlicePlane = 'XY'
+        SliceIndex = 8
+        RefreshDecim = 20
+        ColorLimit = 0.05
+        RoomSize = [6 6 3]
+        Dx = 0.2
+        SourcePos   = [1.0 3.0 1.5]
+        AncPos      = [4.0 3.0 1.5]
+        ErrorMicPos = [5.0 3.0 1.5]
+    end
+
+    properties (Hidden, Constant)
+        SlicePlaneSet = matlab.system.StringSet({'XY','XZ','YZ'})
     end
 
     properties (Access = private)
