@@ -18,6 +18,21 @@ real-time del campo di pressione in stanza.
                                   └──→ [FDTD3DSystem] ──→ P[Nx,Ny,Nz] ──→ [Field3DSink]
 ```
 
+## Troubleshooting
+
+### Errore "No matching constructor found for superclass matlab.system.SystemInterface"
+
+Tipico dopo modifiche alle classi System: MATLAB cachea le classi.
+
+```matlab
+>> clear classes
+>> rehash toolboxcache
+>> debugMatlabSystem
+```
+
+`debugMatlabSystem` esegue tre test in cascata e ti dice esattamente quale
+funziona e quale no. Allega l'output completo se devi chiedere aiuto.
+
 ## File
 
 | File | Ruolo |
